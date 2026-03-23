@@ -30,20 +30,23 @@ jobs:
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
-      - name: build
+      - name: build with gradle
         run: ./gradlew build
-      - name: capture build artifacts
+      - name: upload mod jar artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '21' }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts-${{ runner.os }}-java${{ matrix.java }}
-          path: build/libs/
+          name: fabric-mod-artifacts
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
           retention-days: 30
           compression-level: 6
-      - name: upload test results
-        if: always()
+      - name: upload sources jar
+        if: ${{ runner.os == 'Linux' && matrix.java == '21' }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: build/reports/tests/test/
+          name: fabric-mod-sources
+          path: build/libs/*-sources.jar
           retention-days: 30
+          compression-level: 6
